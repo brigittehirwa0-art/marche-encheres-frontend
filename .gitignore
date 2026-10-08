@@ -1,0 +1,42 @@
+# Dependencies
+node_modules/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Backend TypeScript outputs
+marche-encheres-backend/dist/
+marche-encheres-backend/**/*.js
+marche-encheres-backend/**/*.js.map
+marche-encheres-backend/**/*.d.ts
+marche-encheres-backend/**/*.d.ts.map
+!marche-encheres-backend/tsconfig.json
+!marche-encheres-backend/prisma.config.ts
+!marche-encheres-backend/prisma.config.js
+!marche-encheres-backend/prisma.config.d.ts
+
+# Frontend build outputs
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Local tooling and logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.DS_Store
+.vscode/
+.idea/
+
+# Uploaded files and database artifacts
+marche-encheres-backend/uploads/
+marche-encheres-backend/prisma/dev.db
+marche-encheres-backend/prisma/dev.db-journal
+
+# GitHub Actions
+.github/workflows/*.lock

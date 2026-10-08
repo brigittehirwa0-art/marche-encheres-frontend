@@ -1,0 +1,152 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductStatus {
+  active
+  ended
+  unsold
+  sold
+}
+
+enum ProductCondition {
+  Neuf
+  Tres_bon_etat
+  Bon_etat
+  A_restaurer
+}
+
+enum NotificationType {
+  bid
+  sale
+  system
+}
+
+enum PaymentStatus {
+  pending
+  paid
+  expired
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  avatar    String
+  city      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  products      Product[]
+  bids          Bid[]
+  notifications Notification[]
+  paymentsAsWinner  PaymentWindow[] @relation("WinnerPayments")
+  paymentsAsSeller  PaymentWindow[] @relation("SellerPayments")
+}
+
+model Category {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  icon        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  products Product[]
+}
+
+model Product {
+  id          String          @id @default(uuid())
+  title       String
+  description String
+  condition   ProductCondition
+  startPrice  Float
+  currentPrice Float
+  city        String
+  publishedAt DateTime        @default(now())
+  endsAt      DateTime
+  status      ProductStatus   @default(active)
+
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  sellerId    String
+  seller      User            @relation(fields: [sellerId], references: [id])
+
+  bids      Bid[]
+  payments  PaymentWindow[]
+  images    Image[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+  @@index([sellerId])
+  @@index([status])
+  @@index([endsAt])
+}
+
+model Image {
+  id        String   @id @default(uuid())
+  url       String
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Bid {
+  id         String   @id @default(uuid())
+  amount     Float
+  bidderName String
+  createdAt  DateTime @default(now())
+
+  productId  String
+  product    Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  bidderId   String
+  bidder     User    @relation(fields: [bidderId], references: [id])
+
+  @@index([productId])
+  @@index([bidderId])
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  title       String
+  body        String
+  read        Boolean          @default(false)
+  type        NotificationType
+  createdAt   DateTime         @default(now())
+
+  recipientId String?
+  recipient   User?            @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId])
+}
+
+model PaymentWindow {
+  id        String        @id @default(uuid())
+  amount    Float
+  expiresAt DateTime
+  status    PaymentStatus @default(pending)
+
+  productId  String
+  product    Product      @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sellerId   String
+  seller     User         @relation("SellerPayments", fields: [sellerId], references: [id])
+  winnerId   String
+  winner     User         @relation("WinnerPayments", fields: [winnerId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([productId])
+  @@index([sellerId])
+  @@index([winnerId])
+}

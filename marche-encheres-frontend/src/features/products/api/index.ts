@@ -1,0 +1,1 @@
+export { mockApi } from '../../../core/mock-api';

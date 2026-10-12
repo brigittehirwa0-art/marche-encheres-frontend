@@ -1,0 +1,1 @@
+export { categories } from '../../../core/mock-api';

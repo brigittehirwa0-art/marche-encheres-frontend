@@ -1,0 +1,1 @@
+export type { PaymentWindow } from '../../../core/types';
